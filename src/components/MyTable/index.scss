@@ -1,0 +1,32 @@
+@use "../../styles/variable" as *;
+@use "../../styles/mixins" as *;
+
+.MyTable {
+
+  .header-action {
+    @include flex-right;
+    margin-bottom: 10px;
+
+    .item{
+      margin: 0 10px;
+    }
+
+    &--large {
+      font-size: $content-font-size-large;
+    }
+
+    &--medium {
+      font-size: $content-font-size-middle;
+    }
+
+    &--small {
+      font-size: $content-font-size-small;
+    }
+  }
+
+  .footer {
+    @include flex-center;
+  }
+
+
+}
