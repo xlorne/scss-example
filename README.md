@@ -35,78 +35,90 @@ body {
 }
 
 ```
-* 全局的样式通过`StyleProvider`的方式进行引入
+* 全局的样式通过`ThemeProvider`的方式进行引入
 ```javascript
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles/index.scss';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import {loadRootTheme, StyleProvider} from "./components/ConfigProvider";
+import {loadRootTheme, ThemeProvider} from "./components/ThemeProvider";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
-// 通过loadRootTheme的方式加载全局的样式
+
 const themeConfig = loadRootTheme();
 
 root.render(
     <React.StrictMode>
-        <StyleProvider theme={themeConfig}>
+        <ThemeProvider theme={themeConfig}>
             <App/>
-        </StyleProvider>
+        </ThemeProvider>
     </React.StrictMode>
 );
 
 reportWebVitals();
 
+
 ```
-* 各自组件通过`React.useContext(StyleProviderContext)`的方式获取全局的样式
+* 各自组件通过`React.useContext(ThemeProviderContext)`的方式获取全局的样式
 ```javascript
-import React from "react";
-import {ConfigProvider, Table, ThemeConfig} from "antd";
+import React, {useMemo} from "react";
+import {Button, ConfigProvider, Table, ThemeConfig} from "antd";
 import type {TableProps} from "antd/es/table/InternalTable";
 import "./index.scss";
 import classNames from "classnames";
-import {StyleProviderContext} from "../ConfigProvider";
+import {ThemeProviderContext} from "../ThemeProvider";
 
 export interface MyTableProps<RecordType> {
     tableProps?: TableProps<RecordType>;
     action?: () => React.ReactNode[];
     footer?: React.ReactNode;
+    title?: string;
     size?: 'small' | 'middle' | 'large';
 }
 
 export const MyTable = <RecordType, >(props: MyTableProps<RecordType>) => {
 
-    // 通过React.useContext(StyleProviderContext)的方式获取全局的样式定义
-    const themeConfig = React.useContext(StyleProviderContext);
+    const [version, setVersion] = React.useState(0);
 
-    const colorPrimary = themeConfig.token.colorPrimary;
+    const themeContext = React.useContext(ThemeProviderContext);
 
-    const theme = {
-        token: {
-            colorPrimary: colorPrimary,
-            Table: {
-                bodySortBg: colorPrimary,
-                borderColor: colorPrimary,
-                headerBg: colorPrimary,
-            }
-        },
-    } as ThemeConfig;
+    const theme = useMemo(() => {
+        const colorPrimary = themeContext?.getTheme().token.colorPrimary;
+        return {
+            token: {
+                colorPrimary: colorPrimary,
+                Table: {
+                    bodySortBg: themeContext?.getTheme().token.MyTable?.bodySortBg,
+                    borderColor: themeContext?.getTheme().token.MyTable?.borderColor,
+                    headerBg: themeContext?.getTheme().token.MyTable?.headerBg,
+                    cellFontSize: themeContext?.getTheme().token.contentFontSize,
+                }
+            },
+        } as ThemeConfig;
+    }, [version]);
+
+    console.log('MyTable theme:', theme);
 
     const size = props.size || 'middle';
 
-    const headerClassName = classNames('header-action', {
-        'header-action--small': size === 'small',
-        'header-action--middle': size === 'middle',
-        'header-action--large': size === 'large',
-    });
+    const headerClassName = useMemo(() => {
+        return classNames('header-title', {
+            'header-title--small': size === 'small',
+            'header-title--middle': size === 'middle',
+            'header-title--large': size === 'large',
+        });
+    }, [size])
 
     return (
         <ConfigProvider theme={theme}>
             <div className={"MyTable"}>
-                <div className={headerClassName}>
+                <div className={"header-action"}>
+                    <div className={headerClassName}>
+                        {props.title}
+                    </div>
                     {props.action && props.action().map((item: any, index: number) => {
                         return (
                             <div
@@ -117,6 +129,13 @@ export const MyTable = <RecordType, >(props: MyTableProps<RecordType>) => {
                             </div>
                         )
                     })}
+
+                    <Button
+                        type={"primary"}
+                        onClick={() => {
+                            setVersion(version + 1);
+                        }}
+                    >Reload</Button>
                 </div>
                 <Table
                     {...props.tableProps}
@@ -136,30 +155,34 @@ export const MyTable = <RecordType, >(props: MyTableProps<RecordType>) => {
 
 .MyTable {
 
-  .header-action {
-    @include flex-right;
-    margin-bottom: 10px;
 
-    .item{
-      margin: 0 10px;
+    .header-title{
+        &--large {
+            font-size: $content-font-size-large;
+        }
+
+        &--medium {
+            font-size: $content-font-size-middle;
+        }
+
+        &--small {
+            font-size: $content-font-size-small;
+        }
     }
 
-    &--large {
-      font-size: $content-font-size-large;
+    .header-action {
+        @include flex-right;
+        margin-bottom: 10px;
+
+        .item{
+            margin: 0 10px;
+        }
     }
 
-    &--medium {
-      font-size: $content-font-size-middle;
+    .footer {
+        @include flex-center;
     }
 
-    &--small {
-      font-size: $content-font-size-small;
-    }
-  }
-
-  .footer {
-    @include flex-center;
-  }
 
 }
 ```

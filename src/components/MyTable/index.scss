@@ -3,14 +3,8 @@
 
 .MyTable {
 
-  .header-action {
-    @include flex-right;
-    margin-bottom: 10px;
 
-    .item{
-      margin: 0 10px;
-    }
-
+  .header-title{
     &--large {
       font-size: $content-font-size-large;
     }
@@ -21,6 +15,15 @@
 
     &--small {
       font-size: $content-font-size-small;
+    }
+  }
+
+  .header-action {
+    @include flex-right;
+    margin-bottom: 10px;
+
+    .item{
+      margin: 0 10px;
     }
   }
 

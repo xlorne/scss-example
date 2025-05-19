@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './styles/index.scss';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import {loadRootTheme, StyleProvider} from "./components/ConfigProvider";
+import {loadRootTheme, ThemeProvider} from "./components/ThemeProvider";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -13,9 +13,9 @@ const themeConfig = loadRootTheme();
 
 root.render(
     <React.StrictMode>
-        <StyleProvider theme={themeConfig}>
+        <ThemeProvider theme={themeConfig}>
             <App/>
-        </StyleProvider>
+        </ThemeProvider>
     </React.StrictMode>
 );
 

@@ -7,6 +7,10 @@ export class CSSUtils {
         return value || defaultValue;
     }
 
+    public static setRootVariable(name: string, value: string) {
+        document.documentElement.style.setProperty(name, value);
+    }
+
     /**
      * 获取指定 selector 第一个匹配元素的 CSS 变量值
      */

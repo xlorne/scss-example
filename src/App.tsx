@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {MyTable} from "./components/MyTable";
-import {Button, TableColumnType} from "antd";
+import {Button, Space, TableColumnType} from "antd";
 import {CSSUtils} from "./utils/css";
+import {ThemeProviderContext} from "./components/ThemeProvider";
 
 function App() {
 
@@ -61,34 +62,58 @@ function App() {
     const colorPrimary = CSSUtils.getRootVariable("--primary-color", "#4b14b4");
     const tableActionMarginBottom = CSSUtils.getElementVariable(".MyTable .header-action", 'margin-bottom');
 
+    const themeContext = useContext(ThemeProviderContext);
 
     return (
         <div>
             <p>colorPrimary:{colorPrimary}</p>
             <p>tableActionMarginBottom:{tableActionMarginBottom}</p>
+            <Space>
+                <Button
+                    type="primary"
+                    onClick={()=>{
+                        themeContext?.setLargeFontSize();
+                    }}
+                >Large Font</Button>
+
+                <Button
+                    type="primary"
+                    onClick={()=>{
+                        themeContext?.setMiddleFontSize();
+                    }}
+                >Middle Font</Button>
+
+                <Button
+                    type="primary"
+                    onClick={()=>{
+                        themeContext?.setSmallFontSize();
+                    }}
+                >Small Font</Button>
+            </Space>
+
             <MyTable
                 size={size as 'large' | 'middle' | 'small'}
+                title={"Custom Table"}
                 action={() => {
                     return [
-                        <div>Table</div>,
                         <Button
                             type="primary"
                             onClick={()=>{
                                 setSize('large');
                             }}
-                        >Large</Button>,
+                        >Title Large</Button>,
                         <Button
                             type="primary"
                             onClick={()=>{
                                 setSize('middle');
                             }}
-                        >Middle</Button>,
+                        >Title Middle</Button>,
                         <Button
                             type="primary"
                             onClick={()=>{
                                 setSize('small');
                             }}
-                        >Small</Button>
+                        >Title Small</Button>
                     ]
                 }}
                 footer={(
@@ -107,16 +132,6 @@ function App() {
                     dataSource: data
                 }}
             />
-
-            <div style={{
-                display: 'flex',
-                justifyContent: 'right',
-                alignItems: 'center',
-            }}>
-                <Button
-                    type="primary"
-                >Default Button</Button>
-            </div>
         </div>
     );
 }
